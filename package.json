@@ -1,0 +1,50 @@
+{
+  "name": "@delangle/github-organization-manager",
+  "version": "0.0.1",
+  "description": "Utilities to manage organization with a large number of repositories",
+  "scripts": {
+    "clean": "rimraf ./dist",
+    "build": "npm run clean && tsc",
+    "build:watch": "npm run clean && tsc --watch",
+    "build:types": "apollo codegen:generate --localSchemaFile=node_modules/@octokit/graphql-schema/schema.graphql --globalTypesFile=src/globalTypes/index.ts --target=typescript --includes=src/**/*.query.ts --tagName=gql --addTypename types",
+    "lint": "eslint \"src/**\"",
+    "start": "node ./dist/cli.js"
+  },
+  "author": "Flavien DELANGLE",
+  "license": "GNU",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix"
+    ]
+  },
+  "dependencies": {
+    "@octokit/graphql": "^4.5.6",
+    "commander": "^6.1.0",
+    "dotenv": "^8.2.0",
+    "inquirer": "^7.1.0",
+    "lodash": "^4.17.15",
+    "matcher": "^3.0.0",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "@habx/eslint-config-client": "^3.1.0",
+    "@octokit/graphql-schema": "^8.36.0",
+    "@types/inquirer": "^7.3.1",
+    "@types/lodash": "^4.14.152",
+    "@types/node": "^14.11.2",
+    "@types/node-fetch": "^2.5.7",
+    "@types/sqlite3": "^3.1.6",
+    "eslint": "^7.9.0",
+    "eslint-plugin-graphql": "^4.0.0",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.6",
+    "rimraf": "^3.0.2",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.3"
+  }
+}
