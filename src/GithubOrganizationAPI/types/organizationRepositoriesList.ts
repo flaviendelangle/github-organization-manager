@@ -7,6 +7,15 @@
 // GraphQL query operation: organizationRepositoriesList
 // ====================================================
 
+export interface organizationRepositoriesList_organization_repositories_edges_node_defaultBranchRef {
+  __typename: "Ref";
+  id: string;
+  /**
+   * The ref name.
+   */
+  name: string;
+}
+
 export interface organizationRepositoriesList_organization_repositories_edges_node_releases_nodes {
   __typename: "Release";
   id: string;
@@ -35,6 +44,10 @@ export interface organizationRepositoriesList_organization_repositories_edges_no
    * Indicates if the repository is unmaintained.
    */
   isArchived: boolean;
+  /**
+   * The Ref associated with the repository's default branch.
+   */
+  defaultBranchRef: organizationRepositoriesList_organization_repositories_edges_node_defaultBranchRef | null;
   /**
    * List of releases which are dependent on this repository.
    */

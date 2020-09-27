@@ -20,6 +20,7 @@ const main = async () => {
     organization,
     token,
     repositoryNamePattern: 'client-*',
+    dependencyNamePrefix: '@habx/',
   })
   await repositoryAPI.buildDependencyList()
 }

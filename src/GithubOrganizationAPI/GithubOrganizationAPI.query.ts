@@ -17,6 +17,10 @@ export const organizationQuery = gql`
             id
             name
             isArchived
+            defaultBranchRef {
+              id
+              name
+            }
             releases(last: 1) {
               nodes {
                 id
@@ -24,6 +28,22 @@ export const organizationQuery = gql`
               }
             }
           }
+        }
+      }
+    }
+  }
+`
+
+export const repositoryPackageJSONQuery = gql`
+  query repositoryPackageJSON(
+    $repositoryName: String!
+    $repositoryOwner: String!
+    $packageJSONPath: String!
+  ) {
+    repository(name: $repositoryName, owner: $repositoryOwner) {
+      packageJSON: object(expression: $packageJSONPath) {
+        ... on Blob {
+          text
         }
       }
     }

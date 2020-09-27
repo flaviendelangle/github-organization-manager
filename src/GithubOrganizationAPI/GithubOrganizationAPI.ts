@@ -1,11 +1,20 @@
 import { graphql } from '@octokit/graphql'
+import { AbbreviatedVersion as PackageJSON } from 'package-json'
 
-import { organizationQuery } from './GithubOrganizationAPI.query'
+import { RepositoryBasicInformation } from './GithubOrganizationAPI.interface'
+import {
+  organizationQuery,
+  repositoryPackageJSONQuery,
+} from './GithubOrganizationAPI.query'
 import {
   organizationRepositoriesList,
   organizationRepositoriesListVariables,
-  organizationRepositoriesList_organization_repositories_edges_node,
 } from './types/organizationRepositoriesList'
+import {
+  repositoryPackageJSON,
+  repositoryPackageJSON_repository_packageJSON_Blob,
+  repositoryPackageJSONVariables,
+} from './types/repositoryPackageJSON'
 
 class GithubOrganizationAPI {
   private readonly organization: string
@@ -30,9 +39,7 @@ class GithubOrganizationAPI {
 
   public listRepositories = async (
     cursor?: string
-  ): Promise<
-    organizationRepositoriesList_organization_repositories_edges_node[]
-  > => {
+  ): Promise<RepositoryBasicInformation[]> => {
     const repositories = await this.query<
       organizationRepositoriesList,
       organizationRepositoriesListVariables
@@ -51,9 +58,7 @@ class GithubOrganizationAPI {
     const nextPageCursor = edges[edges.length - 1]?.cursor
     const nodes = edges
       .map((edge) => edge?.node)
-      .filter(
-        (node) => !!node
-      ) as organizationRepositoriesList_organization_repositories_edges_node[]
+      .filter((node) => !!node) as RepositoryBasicInformation[]
 
     if (nextPageCursor) {
       const nextPages = await this.listRepositories(nextPageCursor)
@@ -61,6 +66,36 @@ class GithubOrganizationAPI {
     }
 
     return nodes
+  }
+
+  public getRepositoryPackageJSON = async (
+    repository: RepositoryBasicInformation
+  ): Promise<PackageJSON> => {
+    if (!repository.defaultBranchRef?.name) {
+      throw new Error(`Repository ${repository.name} has no default branch`)
+    }
+
+    const response = await this.query<
+      repositoryPackageJSON,
+      repositoryPackageJSONVariables
+    >(repositoryPackageJSONQuery, {
+      repositoryName: repository.name,
+      repositoryOwner: this.organization,
+      packageJSONPath: `${repository.defaultBranchRef.name}:package.json`,
+    })
+
+    if (!response.repository?.packageJSON) {
+      throw new Error(`No package.json found on ${repository.name}`)
+    }
+
+    const packageJSON = response.repository
+      .packageJSON as repositoryPackageJSON_repository_packageJSON_Blob
+
+    if (!packageJSON.text) {
+      throw new Error(`Package.json empty on ${repository.name}`)
+    }
+
+    return JSON.parse(packageJSON.text)
   }
 }
 
